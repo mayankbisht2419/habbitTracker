@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> <%= title %> </title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    </head>
+    <script>
+        function myFunction() {
+            var daily = document.getElementById("daily");
+            var weekly = document.getElementById("weekly");
+            daily.style.display = "block";
+            weekly.style.display = "none";
+            
+        }
+        function myFunction1() {
+            var daily = document.getElementById("daily");
+            var weekly = document.getElementById("weekly");
+            daily.style.display = "block";
+            weekly.style.display = "none";
+            
+        }
+        function myFunction2() {
+            var daily = document.getElementById("daily");
+            var weekly = document.getElementById("weekly");
+            daily.style.display = "none";
+            weekly.style.display = "block";
+            
+        }
+        function editButtonClicked(id) {
+            console.log("editButtonClicked"+id);
+            var status= document.getElementById('status'+id);
+            var editButton= document.getElementById('editbutton'+id);
+            var saveButton= document.getElementById('savebutton'+id);
+            editButton.style.display='none';
+            saveButton.style.display='block';
+            status.disabled=false;
+
+
+        }
+        function saveButtonClicked(id) {
+            console.log("saveButtonClicked"+id);
+            
+            var status =document.getElementById("status"+id).value;
+            var body = {
+                "habbitId": id,
+                "status": status,
+                };
+            $.ajax({
+                type: "POST",
+                url: "/edit-habbit",
+                data: JSON.stringify(body), 
+                contentType: "application/json; charset=utf-8",
+                dataType:'text',
+                success: function (result) {
+                    
+                },
+                error: function (result, status) {
+                    console.log(status);
+                    console.log(result);
+                }
+            });
+            var status= document.getElementById('status'+id);
+                    var editButton= document.getElementById('editbutton'+id);
+                    var saveButton= document.getElementById('savebutton'+id);
+                    editButton.style.display='block';
+                    saveButton.style.display='none';
+                    status.disabled=true;
+        }
+        
+    </script>
+    <body onload="myFunction()">
+        <!-- Nav Bar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#"> Habbit Tracker </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="#" onclick="myFunction1()">Daily <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="#" onclick="myFunction2()">weekly <span class="sr-only">(current)</span></a>
+                </li>
+              </ul>
+              <div class="my-2 my-lg-0">
+                <form class="form-inline" action="/add-habbit" method="POST" id="habbitForm">
+                    <label class="form-control mr-sm-2 primary">Habbit Name</label>
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="habbitName" id="habbit" required>
+                    <select class="form-select mr-sm-2" form="habbitForm" name="day">
+                        <% for (let day=1 ; day<=7 ; day++) { %>
+                            <option > <%= day %> </option>
+                        <% } %>
+                    </select>
+                    <input class="btn btn-outline-success my-2 my-sm-0" type="submit" type="submit" value="Add Habbit">
+                  </form>
+              </div>
+              
+            </div>
+          </nav>
+
+          <!-- today table -->
+          <div>
+          <table class="table"  id="daily">
+            <thead>
+                <tr>
+                <th scope="col">#</th>
+                <th scope="col">Habbit Name</th>
+                <th scope="col"> Status </th>
+                <th scope="col"> DateToday </th>
+                <th scope="col">  </th>
+                </tr>
+            <tbody>
+                <% for( let i of data) { %> 
+                <tr >
+                <th> <%= i.habbitId %> </th>
+                <td> <%= i.habbitName %> </td>
+                <td>
+                    <select class="custom-select" id="status<%=i.habbitId%>" disabled>
+                        <% if(i.status == "TODO") {%>
+                            <option selected>TODO</option>
+                        <% } else{ %>
+                            <option >TODO</option>
+                        <% } %>
+                        <% if(i.status == "INPROGRESS") {%>
+                            <option selected>INPROGRESS</option>
+                        <% } else{ %>
+                            <option >INPROGRESS</option>
+                        <% } %>
+                        <% if(i.status == "DONE") {%>
+                            <option selected>DONE</option>
+                        <% } else{ %>
+                            <option >DONE</option>
+                        <% } %>
+                    </select>
+                </td>
+                <!-- <td>
+                    <select class="custom-select" id="day<%=i.habbitId%>" disabled>
+                        <% for (let day=1 ; day<=7 ; day++) { 
+                            if(i.dateToday == day){ %>
+                                <option selected> <%= day %> </option>
+                            <% }else { %>
+                                <option > <%= day %> </option>
+                            <% } %>
+                        <% } %>
+                    </select>
+                </td> -->
+                <td>
+                    <button class="btn" id="editbutton<%=i.habbitId%>" onclick="editButtonClicked('<%= i.habbitId %>')"> Edit </button>
+                </td>
+                <td>
+                    <button class="btn" id="savebutton<%=i.habbitId%>" onclick="saveButtonClicked('<%= i.habbitId %>')" style="display: none;"> Save </button>
+                </td>
+                </tr>
+                <% } %>
+            </tbody>
+            </thead>
+        </table>
+            </div>
+        <!-- weekly table -->
+        <div>
+        <table class="table" id="weekly">
+            <thead>
+                <tr>
+                <th scope="col">Habbit Name</th>
+                <% for (let day=1 ; day<=7 ; day++) { %>
+                    <th scope="col"> Day <%= day %></th>
+                <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% 
+                var groupedHabits = {};
+                var habbitList = data;
+                habbitList.forEach(function(habit) {
+                  var habitName = habit.habbitName;
+                  var dateToday = habit.dateToday;
+                
+                  if (groupedHabits.hasOwnProperty(habitName)) {
+                    groupedHabits[habitName].push(dateToday);
+                  } else {
+                    groupedHabits[habitName] = [dateToday];
+                  }
+                }); 
+                for( let key in groupedHabits ) {
+                    if(groupedHabits.hasOwnProperty(key)){
+                        var dates = groupedHabits[key];
+                        
+                %>
+                
+                <tr>
+                <td> <%= key %> </td>
+                    <% for (let day=1 ; day<=7 ; day++) { %>
+                        <% var c=false;for (let i of dates) {
+                            if (i.includes(day)){
+                                c=true;
+                            }
+                       } %>
+                        
+                        <% if(c){ %>
+                            <td> Y </td>
+                        <% } else { %>
+                            <td> N </td>
+                        <% } %>
+                    <% } %>
+                <% } %> 
+                </tr>
+                <% } %>
+
+            </tbody>
+        </table>
+        </div>
+            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>        
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        </body>
+</html>
